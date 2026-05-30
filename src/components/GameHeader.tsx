@@ -5,9 +5,10 @@ type Stats = {
 
 type GameHeaderProps = {
     statsResult: Stats;
+    onReset: () => void;
 }
 
-function GameHeader({ statsResult }: GameHeaderProps) {
+function GameHeader({ statsResult, onReset}: GameHeaderProps) {
 
     return (
         <div className="game-header">
@@ -30,6 +31,10 @@ function GameHeader({ statsResult }: GameHeaderProps) {
                 </div>
 
             </div>
+
+            <button className="reset-btn" onClick={onReset}>Reset Game</button>
+
+
         </div>
     )
 }

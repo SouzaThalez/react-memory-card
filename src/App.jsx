@@ -27,8 +27,16 @@ const cardValues = [
 function App() {
 
   const [cards, setCards] = useState([]);
+  //Keeps track of the two items that are flipped
+  // It only has lenght of 0 to 1 
+  const [flippedCards, setFlippedCards] = useState([]);
+  //Keeps track of matched cards
+  const [matchedCards, setMatchedCards] = useState([]);
+  const [score, setScore] = useState(0);
+  const [moves, setMoves] = useState(0);  
 
   const initializeGame = () => {
+
     //Shuffle cards
 
     // Adding more info to the card
@@ -43,6 +51,10 @@ function App() {
 
     // populando a variavel de estado cards[] com o finalCards[]
     setCards(finalCards);
+    setMoves(0);
+    setScore(0);
+    setMatchedCards([]);
+    setFlippedCards([]);
 
   }
 
@@ -62,7 +74,6 @@ function App() {
 
     // Updated the card flip State
     const newCards = cards.map((c) => {
-      
       if(c.id == card.id){
       
         return {...c, isFlipped: true}; // Maintain all the properties equal.Only change isFlipped
@@ -73,13 +84,71 @@ function App() {
 
     setCards(newCards);
 
+    const newFLippedCards = [...flippedCards, card.id];
+    setFlippedCards(newFLippedCards);
+
+    //Check for a match if two cards a fliped
+    if (flippedCards.length == 1) {
+      const firstCard = cards[flippedCards[0]];
+
+      if (firstCard.value == card.value) {
+       
+        setTimeout(() => {
+
+          setMatchedCards((prev) => [...prev, firstCard.id, card.id]);
+          setScore((prev) => prev + 1);
+        
+          // Updated the card mateched State
+          const newMatchedCards = cards.map((c) => {
+            if(c.id == card.id || c.id == firstCard.id){
+              return {...c, isMatched: true}; // Maintain all the properties equal.Only change matched
+            }else{
+              return c;
+            }
+          })
+
+          setCards((prev)=>
+              prev.map((c) => {
+                if(c.id == card.id || c.id == firstCard.id){
+                  return {...c, isMatched: true};// Maintain all the properties equal.Only change matched
+                }else{
+                  return c;
+                }
+            }),
+          
+          );
+
+          setFlippedCards([]);
+          
+
+        }, 500);
+
+      }else{
+
+        setTimeout(()=>{
+
+          const flippedBackCard = newCards.map((c)=>{
+            if (newFLippedCards.includes(c.id) || c.id === card.id) {
+              return { ...c, isFlipped: false};
+            }else{
+              return c; 
+            }
+          });
+          setCards(flippedBackCard);
+          setFlippedCards([]);
+        },1000)
+
+      }
+    }
+
+    setMoves((prev) => prev + 1);
 
   };
 
   return (
     <div className="app">
 
-        <GameHeader statsResult = {{ score: 10, moves: 6 }} />
+        <GameHeader statsResult = {{ score: score, moves: moves}} onReset={initializeGame} />
         
         <div className="cards-grid">
           
